@@ -7,27 +7,27 @@ public class EventManager : MonoBehaviour
 {
     private Dictionary<string, Action> eventDictionary;
 
-    private static EventManager eventManager;
+    private static EventManager _eventManager;
 
-    public static EventManager instance
+    public static EventManager Instance
     {
         get
         {
-            if (!eventManager)
+            if (!_eventManager)
             {
-                eventManager = FindObjectOfType(typeof(EventManager)) as EventManager;
+                _eventManager = FindObjectOfType(typeof(EventManager)) as EventManager;
 
-                if (!eventManager)
+                if (!_eventManager)
                 {
                     Debug.LogError("There needs to be one active EventManger script on a GameObject in your scene.");
                 }
                 else
                 {
-                    eventManager.Init();
+                    _eventManager.Init();
                 }
             }
 
-            return eventManager;
+            return _eventManager;
         }
     }
 
@@ -43,22 +43,22 @@ public class EventManager : MonoBehaviour
     {
 
         Action thisEvent;
-        if (instance.eventDictionary.TryGetValue(eventName, out thisEvent))
+        if (Instance.eventDictionary.TryGetValue(eventName, out thisEvent))
         {
             thisEvent += listener;
         }
         else
         {
             thisEvent += listener;
-            instance.eventDictionary.Add(eventName, thisEvent);
+            Instance.eventDictionary.Add(eventName, thisEvent);
         }
     }
 
     public static void StopListening(string eventName, Action listener)
     {
-        if (eventManager == null) return;
+        if (_eventManager == null) return;
         Action thisEvent;
-        if (instance.eventDictionary.TryGetValue(eventName, out thisEvent))
+        if (Instance.eventDictionary.TryGetValue(eventName, out thisEvent))
         {
             thisEvent -= listener;
         }
@@ -67,7 +67,7 @@ public class EventManager : MonoBehaviour
     public static void TriggerEvent(string eventName)
     {
         Action thisEvent = null;
-        if (instance.eventDictionary.TryGetValue(eventName, out thisEvent))
+        if (Instance.eventDictionary.TryGetValue(eventName, out thisEvent))
         {
             thisEvent.Invoke();
         }

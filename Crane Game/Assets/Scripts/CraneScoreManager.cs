@@ -1,23 +1,25 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
+using Photon.Pun;
 
 public class CraneScoreManager : MonoBehaviour
 {
     [SerializeField]
-    int _score { get; set; }
+    private int _score = 0;
+    [SerializeField]
+    private TextMeshProUGUI _scoreText;
     [SerializeField]
     private List<GameObject> _gameObjects = new List<GameObject>();
-    Rigidbody _rb;
-
-    private void Start()
-    {
-        _rb = GetComponent<Rigidbody>();
-    }
+    [SerializeField]
+    private PlayerUIManager _playerUIManager;
+    [SerializeField]
+    private PhotonView _photonView;
 
     private void OnTriggerEnter(Collider other)
     {
-        if(other.gameObject.tag == "Objects")
+        if (other.gameObject.tag == "Objects")
         {
             _gameObjects.Add(other.gameObject);
         }
@@ -33,7 +35,25 @@ public class CraneScoreManager : MonoBehaviour
 
     public void CalculateScore()
     {
-        _score = _gameObjects.Count;
-        Debug.Log(_score);
+        _gameObjects.TrimExcess();
+        int temp = _gameObjects.Count;
+        _score += temp;
+    }  
+    
+    [PunRPC]
+    public void Temp()
+    {
+        _score++;
+    }
+
+    public void UpdateScoreText()
+    {
+        _playerUIManager.UpdateText(_scoreText, _score.ToString());
+        Debug.Log("h");
+    }
+
+    public int GetScore()
+    {
+        return _score;
     }
 }
