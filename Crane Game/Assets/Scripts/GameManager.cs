@@ -4,12 +4,24 @@ using UnityEngine;
 using Photon.Pun;
 using TMPro;
 using Photon.Realtime;
+using Photon.Pun.UtilityScripts;
 
-public class GameManager : MonoBehaviour
+public class GameManager : MonoBehaviourPunCallbacks
 {
     private Dictionary<Player, string> _playerList;
     private static GameManager _gameManager;
     private PhotonView _photonView;
+
+    [SerializeField]
+    private GameObject _fruit;
+    [SerializeField]
+    private GameObject _startPanel;
+    [SerializeField]
+    private GameObject _winPanel;
+    [SerializeField]
+    private TextMeshProUGUI _winText;
+    [SerializeField]
+    private ConnectAndJoinRandom connectAndJoin;
     public static GameManager Instance
     {
         get
@@ -59,15 +71,46 @@ public class GameManager : MonoBehaviour
     {
         _photonView.RPC("RegisterPlayerRPC", RpcTarget.All, crane, score);
     }
-
     public void UpdateScore(CraneScoreManager scoreManager)
     {
         //scoreManager.UpdateScoreText();
     }
-
     [PunRPC]
     public void UpdateScoreText(CraneScoreManager scoreManager)
     {
         //scoreManager.UpdateScoreText();
+    }
+
+    // Use this for initialization
+    void Start()
+    {
+        Screen.SetResolution(1024, 768, false);
+        connectAndJoin.enabled = false;
+    }
+
+    public void StartGame()
+    {
+        _startPanel.gameObject.SetActive(false);
+        connectAndJoin.enabled = true;
+    }
+
+    public void ShowWinner(string winnerName)
+    {
+        _winPanel.gameObject.SetActive(true);
+        _winText.text = winnerName + " wins!";
+
+        StartCoroutine(QuitGame());
+    }
+
+    IEnumerator QuitGame()
+    {
+        yield return new WaitForSeconds(2f);
+        PhotonNetwork.Disconnect();
+    }
+
+    public override void OnLeftRoom()
+    {
+        PhotonNetwork.LoadLevel("Test_Map");
+        base.OnLeftRoom();
     }
 }

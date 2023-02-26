@@ -14,8 +14,6 @@ public class CraneScoreManager : MonoBehaviour
     private List<GameObject> _gameObjects = new List<GameObject>();
     [SerializeField]
     private PlayerUIManager _playerUIManager;
-    [SerializeField]
-    private PhotonView _photonView;
 
     private void OnTriggerEnter(Collider other)
     {
@@ -25,19 +23,26 @@ public class CraneScoreManager : MonoBehaviour
         }
     }
 
-    private void OnTriggerExit(Collider other)
-    {
-        if (other.gameObject.tag == "Objects")
+    /*    private void OnTriggerExit(Collider other)
         {
-            _gameObjects.Remove(other.gameObject);
-        }
-    }
+            if (other.gameObject.tag == "Objects")
+            {
+                _gameObjects.Remove(other.gameObject);
+            }
+        }*/
 
+    [PunRPC]
     public void CalculateScore()
     {
         _gameObjects.TrimExcess();
         int temp = _gameObjects.Count;
-        _score += temp;
+        _score = temp;
+
+        if(_score >= 1)
+        {
+            PhotonView photonView = GetComponentInParent<PhotonView>();
+            GameManager.Instance.ShowWinner(photonView.InstantiationId.ToString());
+        }
     }  
     
     [PunRPC]
@@ -49,7 +54,6 @@ public class CraneScoreManager : MonoBehaviour
     public void UpdateScoreText()
     {
         _playerUIManager.UpdateText(_scoreText, _score.ToString());
-        Debug.Log("h");
     }
 
     public int GetScore()

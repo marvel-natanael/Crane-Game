@@ -13,6 +13,11 @@ public class PlayerUIManager : MonoBehaviour
     {
         _photonView = GetComponentInParent<PhotonView>();
         _nameText.text = "Player" + _photonView.InstantiationId;
+
+        if (!_photonView.IsMine)
+            _nameText.color = Color.red;
+        else
+            _nameText.color = Color.green;
     }
     public void UpdateText(TextMeshProUGUI textToUpdate, string text)
     {

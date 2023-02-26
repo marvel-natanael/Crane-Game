@@ -35,6 +35,8 @@ public class CraneControls : MonoBehaviour
     private InputAction _moveAction;
     private InputAction _lowerAction;
 
+    public delegate void CraneEvents();
+    public CraneEvents craneEvents;
     public delegate void CraneLowered();
     public static event CraneLowered onCraneLowered;
     public delegate void CranePulled();
@@ -45,7 +47,6 @@ public class CraneControls : MonoBehaviour
     public static event CraneClosed onCraneClosed;
 
     Animator[] animators;
-
     private Vector3 _networkPosition;
 
     private void Awake()
@@ -55,46 +56,31 @@ public class CraneControls : MonoBehaviour
 
     private void Init()
     {
-        if (_photonView.IsMine)
-        {
-            _playerInput = GetComponent<PlayerInput>();
-            _moveAction = _playerInput.actions["Move"];
-            _lowerAction = _playerInput.actions["Lower"];
-            downwardVector = new Vector3(0, -1.0f, 0);
+        _playerInput = GetComponent<PlayerInput>();
+        _moveAction = _playerInput.actions["Move"];
+        _lowerAction = _playerInput.actions["Lower"];
+        downwardVector = new Vector3(0, -1.0f, 0);
 
-            animators = GetComponentsInChildren<Animator>();
-            StartOpening();
-        }
+        animators = GetComponentsInChildren<Animator>();
+        StartOpening();
     }
 
     private void OnEnable()
     {
-        if (_photonView.IsMine)
-        {
-            _lowerAction.performed += _ => StartLowering();
+        _lowerAction.performed += _ => StartLowering();
 
-            EventManager.StartListening("onCraneLowered", StartClosing);
-            EventManager.StartListening("onCraneClosed", StartPulling);
-            EventManager.StartListening("onCranePulled", StartOpening);
+        EventManager.StartListening("onCraneLowered", StartClosing);
+        EventManager.StartListening("onCraneClosed", StartPulling);
+        EventManager.StartListening("onCranePulled", StartOpening);
 
-            RegisterPlayer();
-        }
     }
 
     private void OnDisable()
     {
-        if (_photonView.IsMine)
-        {
-            _lowerAction.performed -= _ => StartLowering();
-        }
+        _lowerAction.performed -= _ => StartLowering();
+
     }
 
-    // Start is called before the first frame update
-    void Start()
-    {
-    }
-
-    // Update is called once per frame
     void Update()
     {
         if (_photonView.IsMine)
@@ -178,10 +164,15 @@ public class CraneControls : MonoBehaviour
 
     void StartLowering()
     {
-        _canMove = false;
         _isLowering = true;
-        _playerInput.DeactivateInput();
-        //_photonView.RPC("tempRPC", RpcTarget.All);
+        DeactivateMove();
+
+        foreach (Animator anim in animators)
+        {
+            anim.speed = 0;
+        }
+        //tempRPC();
+        _photonView.RPC("tempRPC", RpcTarget.All);
         //Debug.Log("lowering");
     }
 
@@ -196,9 +187,10 @@ public class CraneControls : MonoBehaviour
         _isPulling = true;
         _isLowering = false;
         _isClosing = false;
+
+        ChangeAnimSpeed(0);
         //Debug.Log("pulling");
     }
-
 
     void StartOpening()
     {
@@ -208,11 +200,25 @@ public class CraneControls : MonoBehaviour
 
         //photonView.RPC("ChangeAnim", RpcTarget.Others, "ClawOpen");
 
-        ChangeAnim("ClawOpen");
+        ChangeAnimSpeed(1);
+
+        craneEvents = ActivateMove;
+        StartCoroutine(Delay(craneEvents, "ClawOpen"));
+        //Debug.Log("opening");
+    }
+
+    void ActivateMove()
+    {
         _canMove = true;
         _playerInput.ActivateInput();
 
-        //Debug.Log("opening");
+        UpdateScore();
+    }
+
+    void DeactivateMove()
+    {
+        _canMove = false;
+        _playerInput.DeactivateInput();
     }
 
     void StartClosing()
@@ -222,18 +228,31 @@ public class CraneControls : MonoBehaviour
         _isClosing = true;
 
         //photonView.RPC("ChangeAnim", RpcTarget.Others, "ClawClose");
-        StartCoroutine(Delay());
+        craneEvents = StopClosing;
+        ChangeAnimSpeed(1);
         ChangeAnim("ClawClose");
-
-        UpdateScore();
+        StartCoroutine(Delay(craneEvents, string.Empty));
 
         //Debug.Log("closing");
     }
 
-    IEnumerator Delay()
+    void ChangeAnimSpeed(int speed)
     {
-        yield return new WaitForSeconds(2.5f);
-        StopClosing();
+        if (_photonView.IsMine)
+        {
+            foreach (Animator anim in animators)
+            {
+                anim.speed = speed;
+            }
+        }
+    }
+
+    IEnumerator Delay(CraneEvents craneEvents, string animName)
+    {
+        if (animName != string.Empty)
+            ChangeAnim(animName);
+        yield return new WaitForSecondsRealtime(1.5f);
+        craneEvents?.Invoke();
     }
 
     void StopClosing()
@@ -261,8 +280,21 @@ public class CraneControls : MonoBehaviour
         }
     }
 
-    [PunRPC]
+
     private void ChangeAnim(string triggerName)
+    {
+        if (animators != null)
+        {
+            foreach (Animator anim in animators)
+            {
+                anim.SetTrigger(triggerName);
+            }
+        }
+    }
+
+
+    [PunRPC]
+    private void ChangeAnimRPC(string triggerName)
     {
         if (animators != null)
         {
