@@ -3,11 +3,16 @@ using System.Collections.Generic;
 using Photon.Pun;
 using UnityEngine;
 
-public class Fruits : MonoBehaviour, IPunObservable
+public class RBTransform : MonoBehaviour, IPunObservable
 {
-    private Vector3 _networkPosition;
     [SerializeField]
     private Rigidbody _rigidbody;
+
+    #region Callbacks
+    private void Awake()
+    {
+        _rigidbody = GetComponent<Rigidbody>();
+    }
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
@@ -27,5 +32,5 @@ public class Fruits : MonoBehaviour, IPunObservable
             _rigidbody.position += _rigidbody.velocity * lag;
         }
     }
-
+    #endregion
 }

@@ -7,9 +7,9 @@ using Photon.Pun;
 public class FruitSpawner : MonoBehaviourPunCallbacks
 {
     [SerializeField]
-    GameObject[] _fruit;
-    [SerializeField]
     OnJoinedInstantiate _joinedInstantiate;
+
+    #region Callbacks
     public override void OnCreatedRoom()
     {
         if(PhotonNetwork.CountOfPlayersInRooms > 1)
@@ -22,12 +22,5 @@ public class FruitSpawner : MonoBehaviourPunCallbacks
         //RPCSpawnFood();
         base.OnCreatedRoom();
     }
-
-    private void RPCSpawnFood()
-    {
-        foreach(var fruit in _fruit)
-        {
-            var newFood = PhotonNetwork.InstantiateRoomObject(fruit.name, transform.position, Quaternion.identity, 0);
-        }
-    }
+    #endregion
 }

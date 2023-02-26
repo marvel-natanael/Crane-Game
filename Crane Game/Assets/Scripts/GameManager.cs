@@ -8,12 +8,7 @@ using Photon.Pun.UtilityScripts;
 
 public class GameManager : MonoBehaviourPunCallbacks
 {
-    private Dictionary<Player, string> _playerList;
     private static GameManager _gameManager;
-    private PhotonView _photonView;
-
-    [SerializeField]
-    private GameObject _fruit;
     [SerializeField]
     private GameObject _startPanel;
     [SerializeField]
@@ -34,54 +29,13 @@ public class GameManager : MonoBehaviourPunCallbacks
                 {
                     Debug.LogError("There needs to be one active EventManger script on a GameObject in your scene.");
                 }
-                else
-                {
-                    _gameManager.Init();
-                }
             }
 
             return _gameManager;
         }
     }
 
-    void Init()
-    {
-        _photonView = GetComponent<PhotonView>();
-        if (_playerList == null)
-        {
-            _playerList = new Dictionary<Player, string>();
-        }
-    }
-
-    [PunRPC]
-    public void RegisterPlayerRPC(Player player, string crane)
-    {
-        string thisEvent;
-        if (Instance._playerList.TryGetValue(player, out thisEvent))
-        {
-            thisEvent = crane;
-        }
-        else
-        {
-            thisEvent = crane;
-            Instance._playerList.Add(player, thisEvent);
-        }
-    }
-    public void RegisterPlayer(Player crane, CraneControls score)
-    {
-        _photonView.RPC("RegisterPlayerRPC", RpcTarget.All, crane, score);
-    }
-    public void UpdateScore(CraneScoreManager scoreManager)
-    {
-        //scoreManager.UpdateScoreText();
-    }
-    [PunRPC]
-    public void UpdateScoreText(CraneScoreManager scoreManager)
-    {
-        //scoreManager.UpdateScoreText();
-    }
-
-    // Use this for initialization
+    #region Initialization
     void Start()
     {
         Screen.SetResolution(1024, 768, false);
@@ -93,7 +47,9 @@ public class GameManager : MonoBehaviourPunCallbacks
         _startPanel.gameObject.SetActive(false);
         connectAndJoin.enabled = true;
     }
+    #endregion
 
+    #region Game Controls
     public void ShowWinner(string winnerName)
     {
         _winPanel.gameObject.SetActive(true);
@@ -107,10 +63,13 @@ public class GameManager : MonoBehaviourPunCallbacks
         yield return new WaitForSeconds(2f);
         PhotonNetwork.Disconnect();
     }
+    #endregion
 
+    #region Callbacks
     public override void OnLeftRoom()
     {
         PhotonNetwork.LoadLevel("Test_Map");
         base.OnLeftRoom();
     }
+    #endregion
 }

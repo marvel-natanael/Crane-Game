@@ -266,6 +266,7 @@ GameObject:
   - component: {fileID: 5933278445761200024}
   - component: {fileID: 4729214174498544915}
   - component: {fileID: 1315395302021574372}
+  - component: {fileID: 7413222496455686885}
   m_Layer: 0
   m_Name: Sphere
   m_TagString: Untagged
@@ -402,6 +403,19 @@ FixedJoint:
   m_EnablePreprocessing: 1
   m_MassScale: 1
   m_ConnectedMassScale: 1
+--- !u!114 &7413222496455686885
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5933278445761200030}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0e7a636bdb1108438f55b5c83b6f13b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _rigidbody: {fileID: 0}
 --- !u!1 &5933278445778723266
 GameObject:
   m_ObjectHideFlags: 0
@@ -1389,7 +1403,7 @@ GameObject:
   - component: {fileID: 3797282665731225410}
   - component: {fileID: -5115422238590074477}
   - component: {fileID: 4820925840493653813}
-  - component: {fileID: 8474822338558284712}
+  - component: {fileID: 6442687307303593345}
   m_Layer: 0
   m_Name: Crane
   m_TagString: Untagged
@@ -1566,8 +1580,10 @@ MonoBehaviour:
   observableSearch: 2
   ObservedComponents:
   - {fileID: 4820925840493653813}
+  - {fileID: 6442687307303593345}
   - {fileID: 2551531276797585424}
   - {fileID: 4729214174498544915}
+  - {fileID: 7413222496455686885}
   - {fileID: 3806236657100630531}
   - {fileID: 1386324488592710110}
   - {fileID: 6506501464636971107}
@@ -1603,7 +1619,7 @@ MonoBehaviour:
   m_SynchronizeRotation: 0
   m_SynchronizeScale: 0
   m_UseLocal: 1
---- !u!114 &8474822338558284712
+--- !u!114 &6442687307303593345
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1612,20 +1628,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 5933278447110387122}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Script: {fileID: 11500000, guid: c0e7a636bdb1108438f55b5c83b6f13b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ObjectInterest: 1
-  DefaultInterestGroups: []
-  DestroyWhenStateAuthorityLeaves: 0
-  AllowStateAuthorityOverride: 1
-  AoiPositionSource: {fileID: 0}
-  Flags: 2305
-  NetworkGuid:
-    RawGuidValue: cd56af608ebea514a902665193c85fc5
-  NestedObjects: []
-  NetworkedBehaviours: []
-  SimulationBehaviours: []
+  _rigidbody: {fileID: 0}
 --- !u!1 &5933278447182846627
 GameObject:
   m_ObjectHideFlags: 0

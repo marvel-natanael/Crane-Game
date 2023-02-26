@@ -9,6 +9,8 @@ public class PlayerUIManager : MonoBehaviour
     [SerializeField]
     private TextMeshProUGUI _nameText;
     private PhotonView _photonView;
+
+    #region Initialization
     private void Awake()
     {
         _photonView = GetComponentInParent<PhotonView>();
@@ -19,8 +21,12 @@ public class PlayerUIManager : MonoBehaviour
         else
             _nameText.color = Color.green;
     }
+    #endregion
+
+    #region Methods
     public void UpdateText(TextMeshProUGUI textToUpdate, string text)
     {
         textToUpdate.text = text;
     }
+    #endregion
 }
